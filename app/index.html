@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DHUNE PLAYER</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/fontawesome/fontawesome-all.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,500" rel="stylesheet">
+</head>
+
+<body>
+    <div class="player">
+        <div class="brand">
+            <i class="fas fa-headphones fa-lg fa-pink"></i>&nbsp;DHUNE&nbsp;&nbsp;PLAYER
+        </div>
+        <div class="controls">
+            <i class="fas fa-backward fa-lg fa-fader" id="prev"></i>
+            <i class="fas fa-play fa-2x fa-fade" id="play"></i>
+            <!-- <i class="fas fa-pause fa-2x fa-fade"></i> -->
+            <i class="fas fa-forward fa-lg fa-fader" id="next"></i>
+        </div>
+        <div class="seek">
+            <img src="assets/img/default_album_art_50px.png" alt="Album Art" width="50">
+            <div class="slidecontainer">
+                <input type="range" min="1" max="10000" value="0" class="slider" id="audioSeek">
+            </div>
+        </div>
+        <audio preload="auto">
+            <source src="assets/Fur Elise.mp3" type="audio/mpeg"> Your browser does not support the audio element.
+        </audio>
+    </div>
+    <div class="container-fluid">
+        <h1>Songs</h1>
+        <ol>
+        </ol>
+    </div>
+
+    <script>
+        // document.addEventListener('mousewheel', function (e) {
+        //     if (e.deltaY % 1 !== 0) {
+        //         e.preventDefault();
+        //     }
+        // });
+        const electron = require('electron');
+        electron.webFrame.setZoomLevelLimits(1, 1);
+        const { ipcRenderer } = electron;
+        const ol = document.querySelector('ol');
+        const audio = document.querySelector('audio');
+        const seek = document.querySelector('#audioSeek');
+        const play = document.querySelector('#play');
+        const prev = document.querySelector('#prev');
+        const next = document.querySelector('#next');
+
+        ipcRenderer.on('songs:update', function (event, songs) {
+            // console.log(songs);
+            songs.forEach(song => {
+                let li = document.createElement('li');
+                let liText = document.createTextNode(song);
+                li.appendChild(liText);
+                ol.appendChild(li);
+            });
+        });
+        ipcRenderer.send('songs:update', 'update');
+
+        let seeking;
+
+        play.onclick = () => {
+            if (play.classList.contains("fa-play")) {
+                play.classList.remove("fa-play");
+                play.classList.add("fa-pause");
+                audio.play();
+                seeking = setInterval(() => {
+                    seek.value = parseInt((audio.currentTime / audio.duration) * 10000);
+                }, 50);
+            }
+            else {
+                play.classList.remove("fa-pause");
+                play.classList.add("fa-play");
+                audio.pause();
+            }
+        }
+    </script>
+</body>
+
+</html>
