@@ -4,15 +4,35 @@ const electron = require('electron');
 const url = require('url');
 const fs = require('fs');
 const path = require('path');
+const jsmediatags = require("jsmediatags");
 
-const { app, BrowserWindow, Menu, ipcMain } = electron;
+const { app, BrowserWindow, Menu, ipcMain, globalShortcut } = electron;
 
-process.env.NODE_ENV = 'debug';
+const config = require('./config');
+const utils = require('./utils/index');
+const { id3Tags } = utils;
 
 let mainWindow;
 
+const isSecondInstance = app.makeSingleInstance((commandLine, workingDirectory) => {
+    // If tried to load a second instance, we should focus our window.
+    if (mainWindow) {
+        if (mainWindow.isMinimized()) { mainWindow.restore(); }
+        mainWindow.focus();
+    }
+});
+
+if (isSecondInstance) {
+    app.quit();
+}
+
 // Listen for app to be ready
 app.on('ready', () => {
+
+    // Global shortcut for play/pause
+    globalShortcut.register('MediaPlayPause', () => {
+        mainWindow.webContents.send('controls:playToggle');
+    });
 
     // Create a new window
     mainWindow = new BrowserWindow({
@@ -47,13 +67,22 @@ app.on('ready', () => {
     const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
     Menu.setApplicationMenu(mainMenu);
 
-    let songs = [];
-    songs = walkSync("/Users/krishna/Music/");
+    if (fs.existsSync(app.getPath('userData') + config.dataFile)) {
+        console.log("dataFile exists");
+    }
+    else {
+        mainWindow.show();
+        let songFiles = walkSync(app.getPath('music')).splice(0, 100);
+        songFiles.forEach((songFile, i) => {
+            id3Tags.getSongsTags(songFile).then((songTags) => {
+                mainWindow.webContents.send('songs:add', songTags);
+                // console.log(i);
+            });
+        });
 
-    console.log(songs.length);
-    ipcMain.on('songs:update', (event, msg) => {
-        mainWindow.webContents.send('songs:update', songs);
-    });
+        console.log(songFiles.length);
+    }
+
 });
 
 // Main Menu template
@@ -79,7 +108,7 @@ if (process.platform === 'darwin') {
 
 
 // Devtools for debug purpose
-if (process.env.NODE_ENV !== 'production') {
+if (config.debug) {
     mainMenuTemplate.push({
         label: 'Developer Tools',
         submenu: [
@@ -106,5 +135,5 @@ const walkSync = (dir, filelist = []) => {
             : filelist.concat(path.join(dir, file));
 
     });
-    return filelist.filter((file) => { return (file.indexOf(".mp3") > -1) }).map((file) => { return path.basename(file); });
+    return filelist.filter((file) => { return (file.indexOf(".mp3") > -1) });
 }

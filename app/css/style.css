@@ -6,7 +6,6 @@ body {
     width: 100vw;
     height: 100vh;
     flex-wrap: wrap;
-    /* font-family: 'Dosis', sans-serif; */
     font-family: 'Ubuntu', sans-serif;
     font-weight: 200;
     cursor: default;
@@ -14,12 +13,6 @@ body {
 
 ::selection {
     background: transparent;
-}
-
-div.container-fluid {
-    flex: 1;
-    overflow: auto;
-    background: #fafaed;
 }
 
 div.player {
@@ -100,10 +93,113 @@ div.brand {
     margin-bottom: 33px;
 }
 
-.slider::-moz-range-thumb {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    background: #4CAF50;
-    cursor: pointer;
+div.body {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    overflow: auto;
+    background: #f9f9f9;
+}
+
+h1 {
+    font-weight: 300;
+}
+
+.sidenav {
+    min-width: 200px;
+    padding: 30px 10px;
+}
+
+.sidenav>ul {
+    list-style-type: none;
+    font-weight: 500;
+    color: #777;
+    margin: 50px 0 0 0;
+    padding: 0;
+}
+
+.sidenav>ul>li {
+    margin: 25px 0 25px 20px;
+}
+
+.sidenav>ul>li.selected {
+    color: #e64980;
+}
+
+.container-fluid {
+    padding: 30px;
+    overflow-y: scroll;
+}
+
+.form-group {
+    height: auto;
+}
+
+.search {
+    border-radius: 20px;
+    border: 0px transparent;
+    background: #f2f2f2;
+    padding: 10px 20px;
+}
+
+.search::placeholder {
+    color: #aaa;
+    font-weight: 300;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.songgrid {
+    width: 100px;
+    height: 100px;
+    padding: 10px;
+}
+
+.brand>.fas.play {
+    /* Start the shake animation and make the animation last for 0.5 seconds */
+    animation: shake 4s;
+    /* When the animation is finished, start again */
+    animation-iteration-count: infinite;
+}
+
+@keyframes shake {
+    0% {
+        transform: translate(0px, 0px) rotate(0deg);
+    }
+    5% {
+        transform: translate(0px, 0px) rotate(20deg);
+    }
+    10% {
+        transform: translate(0px, 0px) rotate(-20deg);
+    }
+    15% {
+        transform: translate(0px, 0px) rotate(0deg);
+    }
+}
+
+.or-spacer-vertical {
+    display: inline-block;
+    margin: 15px 0;
+    width: 20px;
+    position: relative;
+}
+
+.or-spacer-vertical .mask {
+    overflow: hidden;
+    width: 10px;
+    height: 100%;
+}
+
+.or-spacer-vertical.right .mask:before {
+    content: '';
+    display: block;
+    margin-left: 10px;
+    width: 10px;
+    height: 100%;
+    border-radius: 8px / 825px;
+    box-shadow: 0 0 4px #aaa;
 }
